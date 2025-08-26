@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cardlibs</title>
+<style>
+body {
+	background-color:beige;
+	font-family:sans-serif;
+}
+.card {
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+	transition: 0.3s;
+	width:10%;
+	height:160px;
+	border-radius:9px;
+	text-align:center;
+	margin:auto;
+}
+.question {
+	background-color:yellow;
+}
+.answer {
+	background-color:white;
+	cursor: pointer;
+}
+.card:hover {
+    transform: scale(1.5);
+}
+#cards-container {
+	  display: flex;
+      gap: 10px;
+      padding: 20px;
+}
+#reroll-btn {
+    padding: 10px;
+    background-color: limegreen;
+    color: white;
+    border: none;border-radius: 5px;
+    cursor: pointer;
+}
+#reroll-btn:hover {
+    background-color: green;
+}
+@media only screen and (max-width: 600px) {
+	#cards-container {
+	   display:block;
+	}
+	.card {
+		width:100%;
+		height:50px;
+		margin-bottom:20px;
+	}
+}
+</style>
+</head>
+<body>
+<form id="upload-form">
+    <label for="question-upload">Questions .txt file:</label>
+    <input type="file" id="question-upload">
+    <label for="answer-upload">Answers .txt file:</label>
+    <input type="file" id="answer-upload">
+    <button type="submit">Submit</button>
+</form>
+
+<div id="cards-container"></div>
+<button id="reroll-btn">Reroll cards</button>
+
+<script>
+    let questions = [];
+    let answers = [];
+
+    function readFile(file, callback) {
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            callback(event.target.result);
+        };
+        
+        reader.readAsText(file);
+    }
+
+    function randomizeCards() {
+        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+        const randomAnswers = [];
+        for (let i = 0; i < 7; i++) {
+            const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+            randomAnswers.push(randomAnswer);
+        }
+
+        const cardsContainer = document.getElementById('cards-container');
+        cardsContainer.innerHTML = '';
+
+        const questionCard = document.createElement('div');
+        questionCard.classList.add('question', 'card');
+        questionCard.textContent = randomQuestion;
+
+        cardsContainer.appendChild(questionCard);
+
+        randomAnswers.forEach(answer => {
+            const answerCard = document.createElement('div');
+            answerCard.classList.add('answer', 'card');
+            answerCard.textContent = answer;
+            answerCard.onclick = randomizeCards;
+
+            cardsContainer.appendChild(answerCard);
+        });
+    }
+
+    document.getElementById('upload-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const questionFile = document.getElementById('question-upload').files[0];
+        const answerFile = document.getElementById('answer-upload').files[0];
+
+        readFile(questionFile, function(questionText) {
+            questions = questionText.split('\n').map(line => line.trim()).filter(line => line !== '');
+            readFile(answerFile, function(answerText) {
+                answers = answerText.split('\n').map(line => line.trim()).filter(line => line !== '');
+                randomizeCards();
+            });
+        });
+    });
+
+    document.getElementById('reroll-btn').addEventListener('click', function() {
+        randomizeCards();
+    });
+</script>
+</body>
+</html>
