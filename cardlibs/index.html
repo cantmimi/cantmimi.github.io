@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>cardlibs</title>
@@ -17,6 +17,7 @@ body {
 	border-radius:9px;
 	text-align:center;
 	margin:auto;
+	overflow:auto;
 }
 .question {
 	background-color:yellow;
@@ -43,6 +44,15 @@ body {
 #reroll-btn:hover {
     background-color: green;
 }
+.highlight {
+  border-image: linear-gradient(to right, #ffef00 0%, #f0b62b 100%) 1;
+  border-width: 4px;
+  border-style: solid;
+  padding: 5px;
+}
+.hidden {
+	display:none;
+}
 @media only screen and (max-width: 600px) {
 	#cards-container {
 	   display:block;
@@ -57,6 +67,7 @@ body {
 	}
 }
 </style>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
 <body>
 <form id="upload-form">
@@ -71,6 +82,7 @@ body {
 <button id="reroll-btn">Reroll cards</button>
 
 <script>
+	var addclass = 'highlight';
     let questions = [];
     let answers = [];
 
@@ -83,6 +95,10 @@ body {
         
         reader.readAsText(file);
     }
+	function highlightCard() {
+		$cols.removeClass(addclass);
+		$(this).addClass(addclass);
+	}
 
     function randomizeCards() {
         const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
@@ -105,9 +121,14 @@ body {
             const answerCard = document.createElement('div');
             answerCard.classList.add('answer', 'card');
             answerCard.textContent = answer;
-            answerCard.onclick = randomizeCards;
 
             cardsContainer.appendChild(answerCard);
+			
+			var $cols = $('.answer').click(function(e) {
+			$cols.removeClass(addclass);
+			$(this).addClass(addclass);
+			$('div:not(.highlight, .question)').addClass('hidden');
+			});
         });
     }
 
@@ -130,5 +151,6 @@ body {
         randomizeCards();
     });
 </script>
-</body>
-</html>
+
+
+</body></html>
